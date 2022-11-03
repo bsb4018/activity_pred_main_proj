@@ -1124,6 +1124,5 @@ numerical_columns:
 - angle(X,gravityMean)
 - angle(Y,gravityMean)
 - angle(Z,gravityMean)
-- subject
 drop_columns:
 - subject
