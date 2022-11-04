@@ -11,7 +11,8 @@ import numpy as np
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.impute import SimpleImputer
-
+from activity.ml.model.estimator import TargetValueMapping
+from activity.utils.main_utils import save_numpy_array_data, save_object
 
 class DataTransformation:
     def __init__(self,
@@ -31,7 +32,7 @@ class DataTransformation:
             raise ActivityException(e,sys) from e
 
     @classmethod
-    def get_transformer_object(cls) -> Pipeline:
+    def get_data_transformer_object(cls) -> Pipeline:
         '''
         pipeline object to transform the dataset
         '''
@@ -75,14 +76,21 @@ class DataTransformation:
             target_feature_train_df = train_df[TARGET_COLUMN]
             
             #Train Target Encoding
+            target_feature_train_df = target_feature_train_df.replace(
+                TargetValueMapping().to_dict()
+            )
 
+            logging.info("Got train features and test features of Training dataset")
+
+            
             input_feature_test_df = test_df.drop(columns=[TARGET_COLUMN], axis=1)
 
             target_feature_test_df = test_df[TARGET_COLUMN]
 
             #Test Target Encoding
-
-            logging.info("Got train features and test features of Training dataset")
+            target_feature_test_df = target_feature_test_df.replace(
+                TargetValueMapping().to_dict()
+            )
 
             logging.info("Got train features and test features of Testing dataset")
 
@@ -105,11 +113,11 @@ class DataTransformation:
             logging.info("Creating train array and test array")
 
             train_arr = np.c_[
-                input_feature_train_final, np.array(target_feature_train_final)
+                np.array(input_feature_train_arr), np.array(target_feature_train_df)
             ]
 
             test_arr = np.c_[
-                input_feature_test_final, np.array(target_feature_test_final)
+                np.array(input_feature_test_arr), np.array(target_feature_test_df)
             ]
 
             save_object(
@@ -124,6 +132,8 @@ class DataTransformation:
                 self.data_transformation_config.transformed_test_file_path,
                 array=test_arr,
             )
+            
+            logging.info("Created train array and test array")
 
             data_transformation_artifact = DataTransformationArtifact(
                 transformed_object_file_path=self.data_transformation_config.transformed_object_file_path,
@@ -136,6 +146,7 @@ class DataTransformation:
             logging.info(
                 "Exited initiate_data_transformation method of Data_Transformation class"
             )
+            
             return data_transformation_artifact
 
         except Exception as e:
