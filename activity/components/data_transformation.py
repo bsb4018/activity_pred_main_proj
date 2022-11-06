@@ -1,5 +1,5 @@
-from activity.entity.artifact_entity import (DataIngestionArtifact,
-                                           DataTransformationArtifact)
+from activity.entity.artifact_entity import (
+                                           DataTransformationArtifact, DataValidationArtifact)
 from activity.entity.config_entity import DataTransformationConfig
 
 import os,sys
@@ -16,10 +16,10 @@ from activity.utils.main_utils import save_numpy_array_data, save_object
 
 class DataTransformation:
     def __init__(self,
-                 data_ingestion_artifact: DataIngestionArtifact,
+                 data_validation_artifact: DataValidationArtifact,
                  data_transformation_config: DataTransformationConfig):
         try:      
-            self.data_ingestion_artifact = data_ingestion_artifact
+            self.data_validation_artifact = data_validation_artifact
             self.data_transformation_config = data_transformation_config
         except Exception as e:
             raise ActivityException(e, sys) from e
@@ -66,15 +66,14 @@ class DataTransformation:
             logging.info("Got the preprocessor object")
 
             train_df = DataTransformation.read_data(
-                file_path=self.data_ingestion_artifact.trained_file_path
+                file_path=self.data_validation_artifact.valid_train_file_path
             )
             test_df = DataTransformation.read_data(
-                file_path=self.data_ingestion_artifact.test_file_path
+                file_path=self.data_validation_artifact.valid_test_file_path
             )
 
             input_feature_train_df = train_df.drop(columns=[TARGET_COLUMN], axis=1)
             target_feature_train_df = train_df[TARGET_COLUMN]
-            
             #Train Target Encoding
             target_feature_train_df = target_feature_train_df.replace(
                 TargetValueMapping().to_dict()
@@ -84,9 +83,7 @@ class DataTransformation:
 
             
             input_feature_test_df = test_df.drop(columns=[TARGET_COLUMN], axis=1)
-
             target_feature_test_df = test_df[TARGET_COLUMN]
-
             #Test Target Encoding
             target_feature_test_df = target_feature_test_df.replace(
                 TargetValueMapping().to_dict()
@@ -98,14 +95,14 @@ class DataTransformation:
                 "Applying preprocessing object on training dataframe and testing dataframe"
             ) 
 
-            input_feature_train_arr = preprocessor.fit_transform(input_feature_train_df)
+            preprocessor_object = preprocessor.fit(input_feature_train_df)
 
+            transformed_input_train_feature = preprocessor_object.transform(input_feature_train_df)
             logging.info(
                 "Used the preprocessor object to fit transform the train features"
             )
 
-            input_feature_test_arr = preprocessor.transform(input_feature_test_df)
-
+            transformed_input_test_feature = preprocessor_object.transform(input_feature_test_df)
             logging.info(
                 "Used the preprocessor object to transform the test features"
             )
@@ -113,16 +110,16 @@ class DataTransformation:
             logging.info("Creating train array and test array")
 
             train_arr = np.c_[
-                np.array(input_feature_train_arr), np.array(target_feature_train_df)
+                np.array(transformed_input_train_feature), np.array(target_feature_train_df)
             ]
 
             test_arr = np.c_[
-                np.array(input_feature_test_arr), np.array(target_feature_test_df)
+                np.array(transformed_input_test_feature), np.array(target_feature_test_df)
             ]
 
             save_object(
                 self.data_transformation_config.transformed_object_file_path,
-                preprocessor,
+                preprocessor_object,
             )
             save_numpy_array_data(
                 self.data_transformation_config.transformed_train_file_path,
@@ -141,8 +138,8 @@ class DataTransformation:
                 transformed_test_file_path=self.data_transformation_config.transformed_test_file_path,
             )
 
-            logging.info("Saved the preprocessor object")
-
+            logging.info(f"Data transformation artifact: {data_transformation_artifact}")
+            
             logging.info(
                 "Exited initiate_data_transformation method of Data_Transformation class"
             )

@@ -2,15 +2,15 @@ import os
 
 from activity.constant.s3_bucket import TRAINING_BUCKET_NAME
 
+SAVED_MODEL_DIR =os.path.join("saved_models")
 TARGET_COLUMN = "Activity"
 PIPELINE_NAME: str = "activity"
 ARTIFACT_DIR: str = "artifact"
+FILE_NAME: str = "activity.csv"
 
 '''
 Defining basic and common file names
 '''
-
-FILE_NAME: str = "activity.csv"
 TRAIN_FILE_NAME: str = "train.csv"
 TEST_FILE_NAME: str = "test.csv"
 PREPROCSSING_OBJECT_FILE_NAME = "preprocessing.pkl"

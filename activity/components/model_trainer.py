@@ -12,18 +12,18 @@ from activity.ml.model.estimator import ActivityModel
 from sklearn import svm
 
 class ModelTrainer:
-    def __init__(
-        self,
-        data_transformation_artifact: DataTransformationArtifact,
+    def __init__(self,
         model_trainer_config: ModelTrainerConfig,
-    ):
-        self.data_transformation_artifact = data_transformation_artifact
-        self.model_trainer_config = model_trainer_config
-
+        data_transformation_artifact: DataTransformationArtifact):
+        try:
+            self.model_trainer_config = model_trainer_config
+            self.data_transformation_artifact = data_transformation_artifact
+        except Exception as e:
+            raise ActivityException(e,sys) 
 
     def train_model(self, x_train, y_train):
         try:
-            lin_svc = svm.LinearSVC(penalty='l2', loss='squared_hinge', C =  0.9412, multi_class='ovr',random_state=44)
+            lin_svc = svm.LinearSVC(penalty='l2', dual=False, loss='squared_hinge', C =  0.9412, multi_class='ovr',random_state=44, max_iter=10000)
             lin_svc.fit(x_train, y_train)
             return lin_svc
         except Exception as e:
@@ -31,15 +31,18 @@ class ModelTrainer:
 
     def initiate_model_trainer(self) -> ModelTrainerArtifact:
 
-        logging.info("Entered initiate_model_trainer method of ModelTrainer class")
-
         try:
+            logging.info("Entered initiate_model_trainer method of ModelTrainer class")
+
+            train_file_path = self.data_transformation_artifact.transformed_train_file_path
+            test_file_path = self.data_transformation_artifact.transformed_test_file_path
+            
             #Load transformed data
             train_arr = load_numpy_array_data(
-                file_path = self.data_transformation_artifact.transformed_train_file_path
+                file_path = train_file_path
             )
             test_arr = load_numpy_array_data(
-                file_path = self.data_transformation_artifact.transformed_test_file_path
+                file_path = test_file_path
             )
             x_train, y_train, x_test, y_test = (
                 train_arr[:, :-1],
@@ -65,6 +68,7 @@ class ModelTrainer:
                 raise Exception("Model is not good try to do more experimentation.")
 
             preprocessor = load_object(file_path=self.data_transformation_artifact.transformed_object_file_path)
+            
             model_dir_path = os.path.dirname(self.model_trainer_config.trained_model_file_path)
             os.makedirs(model_dir_path,exist_ok=True)
             sensor_model = ActivityModel(preprocessor=preprocessor,model=model)

@@ -14,14 +14,13 @@ from activity.logger import logging
 from activity.utils.main_utils import read_yaml_file
 
 class DataIngestion:
-    def __init__(
-        self, data_ingestion_config: DataIngestionConfig = DataIngestionConfig()
-        ):
+    def __init__(self, data_ingestion_config: DataIngestionConfig):
         """
         Constructor to initialize data ingestion configurations
         """
         try:
             self.data_ingestion_config = data_ingestion_config
+            self._schema_config = read_yaml_file(SCHEMA_FILE_PATH)
         except Exception as e:
             raise ActivityException(e, sys)
         
@@ -46,9 +45,10 @@ class DataIngestion:
             raise ActivityException
 
     def split_data_as_train_test(self, dataframe: DataFrame) -> None:
-        logging.info("Entered split_data_as_train_test method of Data_Ingestion class")
-
+        
         try:
+            logging.info("Entered split_data_as_train_test method of Data_Ingestion class")
+
             train_set, test_set = train_test_split(
                 dataframe, test_size=self.data_ingestion_config.train_test_split_ratio
             )
@@ -73,19 +73,15 @@ class DataIngestion:
 
 
     def initiate_data_ingestion(self) -> DataIngestionArtifact:
-        logging.info("Entered initiate_data_ingestion method of Data_Ingestion class")
+
         try:
+            logging.info("Entered initiate_data_ingestion method of Data_Ingestion class")
+
             dataframe = self.export_data_into_feature_store()
-            _schema_config = read_yaml_file(file_path=SCHEMA_FILE_PATH)
-
-            dataframe = dataframe.drop(_schema_config["drop_columns"], axis=1)
-
+            dataframe = dataframe.drop(self._schema_config["drop_columns"], axis=1)
             logging.info("Got the data from mongodb")
-
             self.split_data_as_train_test(dataframe)
-
             logging.info("Performed train test split on the dataset")
-
             logging.info(
                 "Exited initiate_data_ingestion method of Data_Ingestion class"
             )
@@ -94,7 +90,6 @@ class DataIngestion:
                 trained_file_path=self.data_ingestion_config.training_file_path,
                 test_file_path=self.data_ingestion_config.testing_file_path,
             )
-
             logging.info(f"Data ingestion artifact: {data_ingestion_artifact}")
             return data_ingestion_artifact
         except Exception as e:
