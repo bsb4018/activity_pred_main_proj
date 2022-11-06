@@ -2,7 +2,7 @@ import sys
 from pandas import DataFrame
 from activity.exception import ActivityException
 from activity.logger import logging
-
+from sklearn.pipeline import Pipeline
 
 class TargetValueMapping:
     def __init__(self):
@@ -19,3 +19,20 @@ class TargetValueMapping:
     def reverse_mapping(self):
         mapping_response = self.to_dict()
         return dict(zip(mapping_response.values(), mapping_response.keys()))
+
+
+class ActivityModel:
+    def __init__(self,preprocessor,model):
+        try:
+            self.preprocessor = preprocessor
+            self.model = model
+        except Exception as e:
+            raise e
+    
+    def predict(self,x):
+        try:
+            x_transform = self.preprocessor.transform(x)
+            y_hat = self.model.predict(x_transform)
+            return y_hat
+        except Exception as e:
+            raise e

@@ -91,4 +91,4 @@ class ModelTrainerConfig:
         model_trainer_dir, MODEL_TRAINER_TRAINED_MODEL_DIR, MODEL_FILE_NAME
     )
     expected_accuracy: float = MODEL_TRAINER_EXPECTED_SCORE
-    model_config_file_path: str = MODEL_TRAINER_MODEL_CONFIG_FILE_PATH
+    overfitting_underfitting_threshold: float = MODEL_TRAINER_OVER_FIITING_UNDER_FITTING_THRESHOLD

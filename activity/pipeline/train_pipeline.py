@@ -3,7 +3,8 @@ import sys
 from activity.components.data_ingestion import DataIngestion
 from activity.components.data_validation import DataValidation
 from activity.components.data_transformation import DataTransformation
-from activity.entity.config_entity import DataIngestionConfig, DataTransformationConfig, DataValidationConfig
+from activity.components.model_trainer import ModelTrainer
+from activity.entity.config_entity import DataIngestionConfig, DataTransformationConfig, DataValidationConfig, ModelTrainerConfig
 from activity.entity.artifact_entity import DataIngestionArtifact, DataTransformationArtifact, DataValidationArtifact
 from activity.exception import ActivityException
 from activity.logger import logging
@@ -73,6 +74,16 @@ class TrainPipeline:
         except Exception as e:
             raise ActivityException(e, sys) from e
 
+    def start_model_trainer(self,data_transformation_artifact:DataTransformationArtifact):
+        try:
+            model_trainer_config = ModelTrainerConfig(training_pipeline_config=self.training_pipeline_config)
+            model_trainer = ModelTrainer(model_trainer_config, data_transformation_artifact)
+            model_trainer_artifact = model_trainer.initiate_model_trainer()
+            return model_trainer_artifact
+        except  Exception as e:
+            raise  ActivityException(e,sys)
+
+   
     def run_pipeline(self,) -> None:
         try:
             data_ingestion_artifact = self.start_data_ingestion()
@@ -82,6 +93,7 @@ class TrainPipeline:
             data_transformation_artifact = self.start_data_transformation(
                 data_ingestion_artifact=data_ingestion_artifact
             )
+            model_trainer_artifact = self.start_model_trainer(data_transformation_artifact)
 
         except Exception as e:
             raise ActivityException(e, sys) from e
