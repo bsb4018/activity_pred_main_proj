@@ -9,7 +9,7 @@ from activity.logger import logging
 import pandas as pd
 import numpy as np
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler,RobustScaler
 from sklearn.impute import SimpleImputer
 from activity.ml.model.estimator import TargetValueMapping
 from activity.utils.main_utils import save_numpy_array_data, save_object
@@ -43,10 +43,9 @@ class DataTransformation:
             logging.info("Got numerical cols from schema config")
             
             simple_imputer = SimpleImputer(strategy="constant", fill_value=0)
-            standard_scaler = StandardScaler()
-            
+            robust_scaler = RobustScaler()
             preprocessor = Pipeline(
-                steps=[("Imputer", simple_imputer), ("StandardScaler", standard_scaler)]
+                steps=[("Imputer", simple_imputer), ("StandardScaler", robust_scaler)]
             )
 
             logging.info("Created preprocessor object from ColumnTransformer")
