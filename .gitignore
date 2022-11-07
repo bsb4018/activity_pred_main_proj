@@ -19,6 +19,7 @@ artifact/
 .vscode
 logs/
 activity/logs
+saved_models/
 
 # Distribution / packaging
 .Python

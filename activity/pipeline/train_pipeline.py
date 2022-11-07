@@ -4,9 +4,10 @@ from activity.components.data_ingestion import DataIngestion
 from activity.components.data_validation import DataValidation
 from activity.components.data_transformation import DataTransformation
 from activity.components.model_evaluation import ModelEvaluation
+from activity.components.model_pusher import ModelPusher
 from activity.components.model_trainer import ModelTrainer
-from activity.entity.config_entity import DataIngestionConfig, DataTransformationConfig, DataValidationConfig, ModelEvaluationConfig, ModelTrainerConfig, TrainingPipelineConfig
-from activity.entity.artifact_entity import DataIngestionArtifact, DataTransformationArtifact, DataValidationArtifact, ModelTrainerArtifact
+from activity.entity.config_entity import DataIngestionConfig, DataTransformationConfig, DataValidationConfig, ModelEvaluationConfig, ModelPusherConfig, ModelTrainerConfig, TrainingPipelineConfig
+from activity.entity.artifact_entity import DataIngestionArtifact, DataTransformationArtifact, DataValidationArtifact, ModelEvaluationArtifact, ModelTrainerArtifact
 from activity.exception import ActivityException
 from activity.logger import logging
 
@@ -74,16 +75,30 @@ class TrainPipeline:
             )
             data_transformation_artifact = data_transformation.initiate_data_transformation()
             
+            logging.info("Performed the data transformation operation")
+            logging.info(
+                "Exited the start_data_transformation method of TrainPipeline class"
+            )
+
             return data_transformation_artifact
         except Exception as e:
             raise ActivityException(e, sys) from e
 
     def start_model_trainer(self,data_transformation_artifact:DataTransformationArtifact):
         try:
+            logging.info("Entered the start_model_trainer method of TrainPipeline class")
             model_trainer_config = ModelTrainerConfig(training_pipeline_config=self.training_pipeline_config)
             model_trainer = ModelTrainer(model_trainer_config, data_transformation_artifact)
             model_trainer_artifact = model_trainer.initiate_model_trainer()
+
+
+            logging.info("Performed the Model Training operation")
+            logging.info(
+                "Exited the start_model_trainer method of TrainPipeline class"
+            )
+
             return model_trainer_artifact
+
         except  Exception as e:
             raise  ActivityException(e,sys) from e
 
@@ -91,15 +106,38 @@ class TrainPipeline:
                                  model_trainer_artifact:ModelTrainerArtifact,
                                 ):
         try:
+            logging.info("Entered the start_model_evaluation method of TrainPipeline class")
             model_eval_config = ModelEvaluationConfig(self.training_pipeline_config)
             model_eval = ModelEvaluation(model_eval_config, data_validation_artifact, model_trainer_artifact)
             model_eval_artifact = model_eval.initiate_model_evaluation()
+
+            logging.info("Performed the Model Evaluation operation")
+            logging.info(
+                "Exited the start_model_evaluation method of TrainPipeline class"
+            )
             return model_eval_artifact
         except  Exception as e:
             raise  ActivityException(e,sys) from e
 
+    def start_model_pusher(self,model_eval_artifact:ModelEvaluationArtifact):
+        try:
+            logging.info("Entered the start_model_pusher method of TrainPipeline class")
+            model_pusher_config = ModelPusherConfig(training_pipeline_config=self.training_pipeline_config)
+            model_pusher = ModelPusher(model_pusher_config, model_eval_artifact)
+            model_pusher_artifact = model_pusher.initiate_model_pusher()
+
+            logging.info("Performed the Model Pusher operation")
+            logging.info(
+                "Exited the start_model_pusher method of TrainPipeline class"
+            )
+
+            return model_pusher_artifact
+        except  Exception as e:
+            raise  ActivityException(e,sys)
+
     def run_pipeline(self,) -> None:
         try:
+            logging.info("Entered the run_pipeline method of TrainPipeline class")
             TrainPipeline.is_pipeline_running=True
             data_ingestion_artifact:DataIngestionArtifact = self.start_data_ingestion()
             data_validation_artifact = self.start_data_validation(data_ingestion_artifact=data_ingestion_artifact)
@@ -107,7 +145,15 @@ class TrainPipeline:
             model_trainer_artifact = self.start_model_trainer(data_transformation_artifact)
             model_eval_artifact = self.start_model_evaluation(data_validation_artifact, model_trainer_artifact)
             if not model_eval_artifact.is_model_accepted:
-                raise Exception("Trained model is not better than the best model")
-        
+                print("Process Completed Succesfully. Model Trained and Evaluated but the Trained model is not better than the best model. So, we do not push this model to Production. Exiting.")
+                raise Exception("Process Completed Succesfully. Model Trained and Evaluated but the Trained model is not better than the best model. So, we do not push this model to Production. Exiting.")
+            model_pusher_artifact = self.start_model_pusher(model_eval_artifact)
+            TrainPipeline.is_pipeline_running=False
+
+            logging.info("Training Pipeline Running Operation Complete")
+            logging.info(
+                "Exited the run_pipeline method of TrainPipeline class"
+            )
         except Exception as e:
+            TrainPipeline.is_pipeline_running=False
             raise ActivityException(e, sys) from e
