@@ -20,6 +20,7 @@ artifact/
 logs/
 activity/logs
 saved_models/
+saved_models_from_s3/
 
 # Distribution / packaging
 .Python
