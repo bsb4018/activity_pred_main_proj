@@ -1,5 +1,7 @@
-artifacts
-env
-logs
-infrastructure
+artifact
+saved_models
+venv
 docs
+flowcharts
+notebooks
+.git

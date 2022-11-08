@@ -1,2 +1,2 @@
-TRAINING_BUCKET_NAME = "activity-model"
-PREDICTION_BUCKET_NAME = "activity-datasource"
+TRAINING_BUCKET_NAME = "bsb-activity-model"
+PREDICTION_BUCKET_NAME = "bsb-activity-datasource"

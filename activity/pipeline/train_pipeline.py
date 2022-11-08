@@ -10,11 +10,15 @@ from activity.entity.config_entity import DataIngestionConfig, DataTransformatio
 from activity.entity.artifact_entity import DataIngestionArtifact, DataTransformationArtifact, DataValidationArtifact, ModelEvaluationArtifact, ModelTrainerArtifact
 from activity.exception import ActivityException
 from activity.logger import logging
+from activity.constant.s3_bucket import TRAINING_BUCKET_NAME
+from activity.constant.training_pipeline import SAVED_MODEL_DIR
+from activity.cloud_storage.s3_syncer import S3Sync
 
 class TrainPipeline:
     is_pipeline_running=False
     def __init__(self):
         self.training_pipeline_config = TrainingPipelineConfig()
+        self.s3_sync = S3Sync()
 
     def start_data_ingestion(self) -> DataIngestionArtifact:
         try:
@@ -135,6 +139,26 @@ class TrainPipeline:
         except  Exception as e:
             raise  ActivityException(e,sys)
 
+    def sync_artifact_dir_to_s3(self):
+        try:
+            logging.info("Entered the sync_artifact_dir_to_s3 method of TrainPipeline class")
+            aws_bucket_url = f"s3://{TRAINING_BUCKET_NAME}/artifact/{self.training_pipeline_config.timestamp}"
+            self.s3_sync.sync_folder_to_s3(folder = self.training_pipeline_config.artifact_dir,aws_buket_url=aws_bucket_url)
+            logging.info("Performed Syncing of artifact to S3 bucket")
+
+        except Exception as e:
+            raise ActivityException(e,sys)
+
+    def sync_saved_model_dir_to_s3(self):
+        try:
+            logging.info("Entered the sync_saved_model_dir_to_s3 method of TrainPipeline class")
+            aws_bucket_url = f"s3://{TRAINING_BUCKET_NAME}/{SAVED_MODEL_DIR}"
+            self.s3_sync.sync_folder_to_s3(folder = SAVED_MODEL_DIR,aws_buket_url=aws_bucket_url)
+            logging.info("Performed Syncing of saved models to S3 bucket")
+
+        except Exception as e:
+            raise ActivityException(e,sys)
+
     def run_pipeline(self,) -> None:
         try:
             logging.info("Entered the run_pipeline method of TrainPipeline class")
@@ -149,11 +173,15 @@ class TrainPipeline:
                 raise Exception("Process Completed Succesfully. Model Trained and Evaluated but the Trained model is not better than the best model. So, we do not push this model to Production. Exiting.")
             model_pusher_artifact = self.start_model_pusher(model_eval_artifact)
             TrainPipeline.is_pipeline_running=False
+            
+            #self.sync_artifact_dir_to_s3()
+            #self.sync_saved_model_dir_to_s3()
 
             logging.info("Training Pipeline Running Operation Complete")
             logging.info(
                 "Exited the run_pipeline method of TrainPipeline class"
             )
         except Exception as e:
+            #self.sync_artifact_dir_to_s3()
             TrainPipeline.is_pipeline_running=False
             raise ActivityException(e, sys) from e
