@@ -38,7 +38,6 @@ async def train_route():
         return Response(f"Error Occurred! {e}")
 
 
-
 @app.post("/predict")
 async def predict_route(csv_file: UploadFile = File(...)):
     try:
