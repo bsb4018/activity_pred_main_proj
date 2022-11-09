@@ -44,7 +44,7 @@ async def predict_route(csv_file: UploadFile = File(...)):
        
         df = pd.read_csv(csv_file.file)
         prediction_pipeline = PredictionPipeline()
-        predictions = prediction_pipeline.predict_from_local(df)
+        predictions = prediction_pipeline.predict(df)
         if not predictions:
             return Response("Model is not available")
         return { "prediction": predictions}
