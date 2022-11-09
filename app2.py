@@ -1,4 +1,4 @@
-
+from activity.pipeline.train_pipeline import TrainPipeline
 from fastapi import FastAPI, File, UploadFile
 from activity.constant.application import APP_HOST, APP_PORT
 from starlette.responses import RedirectResponse
@@ -23,6 +23,18 @@ app.add_middleware(
 async def index():
     return RedirectResponse(url="/docs")
 
+@app.get("/train")
+async def train_route():
+    try:
+
+        train_pipeline = TrainPipeline()
+        if train_pipeline.is_pipeline_running:
+            return Response("Training pipeline is already running.")
+        train_pipeline.run_pipeline()
+        return Response("Training successful !!")
+    except Exception as e:
+        return Response(f"Error Occurred! {e}")
+
 
 @app.post("/predict")
 async def predict_route(csv_file: UploadFile = File(...)):
@@ -39,5 +51,3 @@ async def predict_route(csv_file: UploadFile = File(...)):
         raise Response(f"Error Occured! {e}")
 
 
-if __name__ == '__main__':
-    app_run(app, host=APP_HOST, port=APP_PORT)

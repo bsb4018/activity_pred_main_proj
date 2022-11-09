@@ -53,5 +53,3 @@ async def predict_route(csv_file: UploadFile = File(...)):
         raise Response(f"Error Occured! {e}")
 
 
-#if __name__ == '__main__':
-#    app_run(app, host=APP_HOST, port=APP_PORT)
