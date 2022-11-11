@@ -71,8 +71,8 @@ class ModelTrainer:
             
             model_dir_path = os.path.dirname(self.model_trainer_config.trained_model_file_path)
             os.makedirs(model_dir_path,exist_ok=True)
-            sensor_model = ActivityModel(preprocessor=preprocessor,model=model)
-            save_object(self.model_trainer_config.trained_model_file_path, obj=sensor_model)
+            activity_model = ActivityModel(preprocessor=preprocessor,model=model)
+            save_object(self.model_trainer_config.trained_model_file_path, obj=activity_model)
 
             #Model Trainer artifact
             model_trainer_artifact = ModelTrainerArtifact(
