@@ -15,7 +15,7 @@ from activity.constant.training_pipeline import SAVED_MODEL_DIR
 from activity.cloud_storage.s3_syncer import S3Sync
 
 class TrainPipeline:
-    is_pipeline_running=False
+    #is_pipeline_running=False
     def __init__(self):
         self.training_pipeline_config = TrainingPipelineConfig()
         self.s3_sync = S3Sync()
@@ -162,7 +162,7 @@ class TrainPipeline:
     def run_pipeline(self,) -> None:
         try:
             logging.info("Entered the run_pipeline method of TrainPipeline class")
-            TrainPipeline.is_pipeline_running=True
+            #TrainPipeline.is_pipeline_running=True
             data_ingestion_artifact:DataIngestionArtifact = self.start_data_ingestion()
             data_validation_artifact = self.start_data_validation(data_ingestion_artifact=data_ingestion_artifact)
             data_transformation_artifact = self.start_data_transformation(data_validation_artifact=data_validation_artifact)
@@ -172,16 +172,16 @@ class TrainPipeline:
                 print("Process Completed Succesfully. Model Trained and Evaluated but the Trained model is not better than the best model. So, we do not push this model to Production. Exiting.")
                 raise Exception("Process Completed Succesfully. Model Trained and Evaluated but the Trained model is not better than the best model. So, we do not push this model to Production. Exiting.")
             model_pusher_artifact = self.start_model_pusher(model_eval_artifact)
-            TrainPipeline.is_pipeline_running=False
+            #TrainPipeline.is_pipeline_running=False
             
-            self.sync_artifact_dir_to_s3()
-            self.sync_saved_model_dir_to_s3()
+            #self.sync_artifact_dir_to_s3()
+            #self.sync_saved_model_dir_to_s3()
 
             logging.info("Training Pipeline Running Operation Complete")
             logging.info(
                 "Exited the run_pipeline method of TrainPipeline class"
             )
         except Exception as e:
-            self.sync_artifact_dir_to_s3()
-            TrainPipeline.is_pipeline_running=False
+            #self.sync_artifact_dir_to_s3()
+            #TrainPipeline.is_pipeline_running=False
             raise ActivityException(e, sys) from e

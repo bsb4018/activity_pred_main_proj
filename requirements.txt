@@ -20,4 +20,5 @@ wincertstore
 xgboost
 neuro-mf
 python-multipart
+apache-airflow
 -e.
