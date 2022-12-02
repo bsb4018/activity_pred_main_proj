@@ -5,3 +5,4 @@ docs
 flowcharts
 notebooks
 .git
+.terraform
