@@ -43,7 +43,7 @@ class DataValidation:
         except Exception as e:
             raise ActivityException(e, sys) from e
 
-    def is_numerical_column_exist(self, df: DataFrame) -> bool:
+    def is_numerical_column_exist(self, df: DataFrame):
         '''
         Takes input a dataframe and returns 'True' 
         if there are any columns that are numerical
