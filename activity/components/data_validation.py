@@ -58,7 +58,7 @@ class DataValidation:
                     missing_numerical_columns.append(column)
             
             logging.info(f"Missing numerical column: {missing_numerical_columns}")
-            return status
+            return status, missing_numerical_columns
 
         except Exception as e:
             raise ActivityException(e, sys) from e
@@ -104,6 +104,8 @@ class DataValidation:
         '''
         try:
             validation_error_msg = ""
+            missing_numerical_columns_train = {}
+            missing_numerical_columns_test = {}
             logging.info("Starting data validation")
 
             train_df, test_df = (
@@ -133,14 +135,24 @@ class DataValidation:
 
             #Validating numerical columns
 
-            status = self.is_numerical_column_exist(df=train_df)
+            status,missing_numerical_columns_train = self.is_numerical_column_exist(df=train_df)
             if not status:
+                missing_report_train_file_path = self.data_validation_config.invalid_train_file_path
+                #Create directory
+                dir_path = os.path.dirname(missing_report_train_file_path)
+                os.makedirs(dir_path,exist_ok=True)
+                write_yaml_file(file_path=missing_report_train_file_path,content=missing_numerical_columns_train,)
                 validation_error_msg += (
                     f"Numerical columns are missing in training dataframe."
                 )
 
-            status = self.is_numerical_column_exist(df=test_df)
+            status,missing_numerical_columns_test = self.is_numerical_column_exist(df=test_df)
             if not status:
+                missing_report_test_file_path = self.data_validation_config.invalid_test_file_path
+                #Create directory
+                dir_path = os.path.dirname(missing_report_test_file_path)
+                os.makedirs(dir_path,exist_ok=True)
+                write_yaml_file(file_path=missing_report_test_file_path,content=missing_numerical_columns_test,)
                 validation_error_msg += (
                     f"Numerical columns are missing in testing dataframe."
                 )
