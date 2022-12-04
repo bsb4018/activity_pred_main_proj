@@ -1,7 +1,11 @@
+scikit-learn
+pandas
+numpy
+uvicorn
+pymongo
 alembic==1.8.1
 attrs==22.1.0
 autopage==0.5.1
-certifi @ file:///C:/b/abs_ac29jvt43w/croot/certifi_1665076682579/work/certifi
 cliff==4.0.0
 cloudpickle==2.2.0
 cmaes==0.9.0
@@ -30,7 +34,6 @@ prometheus-client==0.15.0
 prometheus-flask-exporter==0.21.0
 protobuf==4.21.9
 PyJWT==2.6.0
-pywin32==305
 querystring-parser==1.2.4
 smmap==5.0.0
 SQLAlchemy==1.4.43
