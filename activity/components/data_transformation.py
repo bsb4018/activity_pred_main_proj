@@ -11,6 +11,7 @@ import numpy as np
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler,RobustScaler
 from sklearn.impute import SimpleImputer
+from sklearn.decomposition import PCA
 from activity.ml.model.estimator import TargetValueMapping
 from activity.utils.main_utils import save_numpy_array_data, save_object
 
@@ -44,8 +45,9 @@ class DataTransformation:
             
             simple_imputer = SimpleImputer(strategy="constant", fill_value=0)
             robust_scaler = RobustScaler()
+            dim_reduction = PCA(n_components=0.95)
             preprocessor = Pipeline(
-                steps=[("Imputer", simple_imputer), ("StandardScaler", robust_scaler)]
+                steps=[("Imputer", simple_imputer), ("StandardScaler", robust_scaler), ("DimensionReduction", dim_reduction)]
             )
 
             logging.info("Created preprocessor object from ColumnTransformer")
