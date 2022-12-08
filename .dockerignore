@@ -5,3 +5,5 @@ docs
 flowcharts
 notebooks
 .git
+.terraform/
+.terraform.lock.hcl
