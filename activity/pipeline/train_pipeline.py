@@ -185,6 +185,7 @@ class TrainPipeline:
             model_pusher_artifact = self.start_model_pusher(model_eval_artifact)
             TrainPipeline.is_pipeline_running=False
             
+            self.sync_logs_dir_to_s3()
             self.sync_artifact_dir_to_s3()
             self.sync_saved_model_dir_to_s3()
 
@@ -193,6 +194,7 @@ class TrainPipeline:
                 "Exited the run_pipeline method of TrainPipeline class"
             )
         except Exception as e:
+            self.sync_logs_dir_to_s3()
             self.sync_artifact_dir_to_s3()
             TrainPipeline.is_pipeline_running=False
             raise ActivityException(e, sys) from e
