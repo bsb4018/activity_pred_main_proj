@@ -1,5 +1,5 @@
 import sys
-
+import os
 from activity.components.data_ingestion import DataIngestion
 from activity.components.data_validation import DataValidation
 from activity.components.data_transformation import DataTransformation
@@ -10,7 +10,7 @@ from activity.entity.config_entity import DataIngestionConfig, DataTransformatio
 from activity.entity.artifact_entity import DataIngestionArtifact, DataTransformationArtifact, DataValidationArtifact, ModelEvaluationArtifact, ModelTrainerArtifact
 from activity.exception import ActivityException
 from activity.logger import logging
-from activity.constant.s3_bucket import TRAINING_BUCKET_NAME
+from activity.constant.s3_bucket import TRAINING_BUCKET_NAME,PREDICTION_BUCKET_NAME
 from activity.constant.training_pipeline import SAVED_MODEL_DIR
 from activity.cloud_storage.s3_syncer import S3Sync
 
@@ -138,6 +138,17 @@ class TrainPipeline:
             return model_pusher_artifact
         except  Exception as e:
             raise  ActivityException(e,sys)
+    
+    def sync_logs_dir_to_s3(self):
+        try:
+            logging.info("Entered the sync_logs_dir_to_s3 method of TrainPipeline class")
+            aws_bucket_url = f"s3://{TRAINING_BUCKET_NAME}/logs/{self.training_pipeline_config.timestamp}"
+            logs_dir = os.path.join("logs", self.training_pipeline_config.timestamp)
+            self.s3_sync.sync_folder_to_s3(folder = logs_dir,aws_buket_url=aws_bucket_url)
+            logging.info("Performed Syncing of logs to S3 bucket")
+
+        except Exception as e:
+            raise ActivityException(e,sys)
 
     def sync_artifact_dir_to_s3(self):
         try:
