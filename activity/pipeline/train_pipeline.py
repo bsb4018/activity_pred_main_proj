@@ -143,8 +143,8 @@ class TrainPipeline:
     def sync_logs_dir_to_s3(self):
         try:
             logging.info("Entered the sync_logs_dir_to_s3 method of TrainPipeline class")
-            aws_bucket_url = f"s3://{TRAINING_BUCKET_NAME}/logs/{self.training_pipeline_config.timestamp}"
-            logs_dir = os.path.join(from_root(),"logs", self.training_pipeline_config.timestamp)
+            aws_bucket_url = f"s3://{TRAINING_BUCKET_NAME}/logs"
+            logs_dir = os.path.join(from_root(),"logs")
             self.s3_sync.sync_folder_to_s3(folder = logs_dir,aws_buket_url=aws_bucket_url)
             logging.info("Performed Syncing of logs to S3 bucket")
 
