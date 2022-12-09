@@ -28,6 +28,6 @@ module "sensor_ecr" {
   source = "./sensor_ecr"
 }
 
-#module "sensor_ec2" {
-#  source = "./sensor_ec2"
-#}
+module "sensor_ec2" {
+  source = "./sensor_ec2"
+}

@@ -5,7 +5,7 @@ variable "aws_region" {
 
 variable "app_ami" {
   type    = string
-  default = "ami-05bd86a47b3b8e24b"
+  default = "ami-07ffb2f4d65357b42"
 }
 
 variable "app_instance_type" {
@@ -15,7 +15,7 @@ variable "app_instance_type" {
 
 variable "app_key_pair_name" {
   type    = string
-  default = "shivkp"
+  default = "activity-ec2-keypair"
 }
 
 variable "app_tag_name" {
@@ -35,7 +35,7 @@ variable "app_sg_group_name" {
 
 variable "app_ingress_from_port" {
   type    = list(number)
-  default = [22, 8080]
+  default = ["22", "80", "443", "8080", "3000", "9100", "9090"]
 }
 
 variable "app_cidr_block" {
@@ -50,7 +50,7 @@ variable "app_protocol" {
 
 variable "app_ingress_to_port" {
   type    = list(number)
-  default = [22, 8080]
+  default = ["22", "80", "443", "8080", "3000", "9100", "9090"]
 }
 
 variable "app_egress_from_port" {
@@ -64,7 +64,7 @@ variable "app_egress_to_port" {
 }
 
 variable "app_volume_size" {
-  default = 50
+  default = 16
   type    = number
 }
 
