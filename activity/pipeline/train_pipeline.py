@@ -13,7 +13,6 @@ from activity.logger import logging
 from activity.constant.s3_bucket import TRAINING_BUCKET_NAME,PREDICTION_BUCKET_NAME
 from activity.constant.training_pipeline import SAVED_MODEL_DIR
 from activity.cloud_storage.s3_syncer import S3Sync
-from from_root import from_root
 
 class TrainPipeline:
     is_pipeline_running=False
@@ -144,7 +143,7 @@ class TrainPipeline:
         try:
             logging.info("Entered the sync_logs_dir_to_s3 method of TrainPipeline class")
             aws_bucket_url = f"s3://{TRAINING_BUCKET_NAME}/logs"
-            logs_dir = os.path.join(from_root(),"logs")
+            logs_dir = os.path.join("logs")
             self.s3_sync.sync_folder_to_s3(folder = logs_dir,aws_buket_url=aws_bucket_url)
             logging.info("Performed Syncing of logs to S3 bucket")
 
@@ -186,7 +185,7 @@ class TrainPipeline:
             model_pusher_artifact = self.start_model_pusher(model_eval_artifact)
             TrainPipeline.is_pipeline_running=False
             
-            self.sync_logs_dir_to_s3()
+            #self.sync_logs_dir_to_s3()
             self.sync_artifact_dir_to_s3()
             self.sync_saved_model_dir_to_s3()
 
@@ -195,7 +194,7 @@ class TrainPipeline:
                 "Exited the run_pipeline method of TrainPipeline class"
             )
         except Exception as e:
-            self.sync_logs_dir_to_s3()
+            #self.sync_logs_dir_to_s3()
             self.sync_artifact_dir_to_s3()
             TrainPipeline.is_pipeline_running=False
             raise ActivityException(e, sys) from e
