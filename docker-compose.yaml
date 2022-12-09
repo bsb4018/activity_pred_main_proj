@@ -25,6 +25,7 @@ services:
       - "logs/"
 
 
+
   influxdb:
     image: influxdb:1.7
     container_name: influxdb
