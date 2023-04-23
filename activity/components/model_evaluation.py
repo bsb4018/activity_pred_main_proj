@@ -28,10 +28,11 @@ class ModelEvaluation:
             valid_train_file_path = self.data_validation_artifact.valid_train_file_path
             valid_test_file_path = self.data_validation_artifact.valid_test_file_path
             
-            train_df = pd.read_csv(valid_train_file_path)
+            #train_df = pd.read_csv(valid_train_file_path)
             test_df = pd.read_csv(valid_test_file_path)
 
-            df = pd.concat([train_df,test_df])
+            #df = pd.concat([train_df,test_df])
+            df = test_df
             y_true = df[TARGET_COLUMN]
             y_true.replace(TargetValueMapping().to_dict(),inplace=True)
             df.drop(TARGET_COLUMN, axis=1, inplace=True)
