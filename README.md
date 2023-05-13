@@ -77,7 +77,7 @@ export AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY>
 
 export AWS_REGION_NAME=<AWS_REGION_NAME>
 
-export MONGODB_URL="mongodb+srv://<username>:<password>@cluster.3gdw4s.mongodb.net/?retryWrites=true&w=majority"
+export MONGODB_URL=""
 ```
 
 ### Step 7 - Start locally
